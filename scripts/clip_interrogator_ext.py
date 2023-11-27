@@ -272,7 +272,7 @@ def prompt_tab():
         with gr.Row():
             image = gr.Image(type='pil', label="Image")
             with gr.Column():
-                mode = gr.Radio(['best', 'fast', 'classic', 'negative'], label='Mode', value='best')
+                mode = gr.Radio(['caption', 'best', 'fast', 'classic', 'negative'], label='Mode', value='best')
                 clip_model = gr.Dropdown(get_models(), value='ViT-L-14/openai', label='CLIP Model')
         prompt = gr.Textbox(label="Prompt", lines=3)
     with gr.Row():
@@ -334,7 +334,7 @@ class InterrogatorPromptRequest(InterrogatorAnalyzeRequest):
     mode: str = Field(
         default="fast",
         title="Mode",
-        description="The mode used to generate the prompt. Can be one of: best, fast, classic, negative.",
+        description="The mode used to generate the prompt. Can be one of: caption, best, fast, classic, negative.",
     )
 
 def mount_interrogator_api(_: gr.Blocks, app: FastAPI):
@@ -373,6 +373,11 @@ def mount_interrogator_api(_: gr.Blocks, app: FastAPI):
             "trending": trending_ranks,
             "flavor": flavor_ranks,
         }
+    
+    @app.post("/interrogator/unload")
+    async def unload_model():
+        unload()
+        return {"msg": "ok"}
 
 
 script_callbacks.on_app_started(mount_interrogator_api)
